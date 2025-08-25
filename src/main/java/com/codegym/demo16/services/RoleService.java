@@ -24,9 +24,34 @@ public class RoleService {
             RoleDTO roleDTO = new RoleDTO();
             roleDTO.setId(role.getId());
             roleDTO.setName(role.getName());
-            roleDTO.setDescription(role.getDescription());
             list.add(roleDTO);
         }
         return list;
+    }
+
+    public void createRole(RoleDTO roleDTO) {
+        Role role = new Role();
+        role.setName(roleDTO.getName());
+        roleRepository.save(role);
+    }
+
+    public RoleDTO getRoleById(Long id) {
+        return roleRepository.findById(id).map(role -> {
+            RoleDTO dto = new RoleDTO();
+            dto.setId(role.getId());
+            dto.setName(role.getName());
+            return dto;
+        }).orElse(null);
+    }
+
+    public void updateRole(Long id, RoleDTO roleDTO) {
+        roleRepository.findById(id).ifPresent(role -> {
+            role.setName(roleDTO.getName());
+            roleRepository.save(role);
+        });
+    }
+
+    public void deleteRole(Long id) {
+        roleRepository.deleteById(id);
     }
 }

@@ -13,15 +13,28 @@
                 ✏️ Edit Department
             </div>
             <div class="card-body">
-                <form th:action="@{/departments/update/{id}(id=${department.id})}" th:object="${department}" method="post">
+                <form th:action="@{/departments/update/{id}(id=${department.id})}"
+                      th:object="${department}" method="post">
+
+                    <!-- Department ID (readonly) -->
                     <div class="mb-3">
-                        <label class="form-label">Department ID</label>
-                        <input type="text" class="form-control" th:field="*{id}" readonly>
+                        <label for="id" class="form-label">Department ID</label>
+                        <input type="text" th:field="*{id}" id="id"
+                               class="form-control" readonly>
                     </div>
+
+                    <!-- Department Name -->
                     <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <input type="text" class="form-control" th:field="*{name}" required>
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" th:field="*{name}" id="name"
+                               th:class="${#fields.hasErrors('name') ? 'form-control is-invalid' : 'form-control'}"
+                               required>
+                        <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback">
+                            <span th:errors="*{name}"></span>
+                        </div>
                     </div>
+
+                    <!-- Buttons -->
                     <div class="d-flex justify-content-between">
                         <a href="/departments" class="btn btn-secondary">
                             <i class="fa fa-arrow-left"></i> Back
@@ -30,6 +43,7 @@
                             <i class="fa fa-save"></i> Save Changes
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>

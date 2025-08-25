@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IDepartmentRepository extends JpaRepository<Department, Long> {
+    boolean existsByName(String name);
     // Additional query methods can be defined here if needed
 }

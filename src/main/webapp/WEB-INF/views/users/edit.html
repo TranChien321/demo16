@@ -15,43 +15,64 @@
         </div>
         <div class="card-body">
             <form th:object="${user}" class="form"
-                    th:action="@{/users/{id}/update(id=${user.id})}"
-                    method="post"
-                    enctype="multipart/form-data">
+                  th:action="@{/users/{id}/update(id=${user.id})}"
+                  method="post"
+                  enctype="multipart/form-data">
 
                 <div class="row mb-3">
                     <div class="col-12">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" th:field="*{username}" class="form-control form-control-lg" id="username">
+                        <input type="text" th:field="*{username}"
+                               th:class="${#fields.hasErrors('username') ? 'form-control is-invalid' : 'form-control form-control-lg'}"
+                               id="username">
+                        <div th:if="${#fields.hasErrors('username')}" class="invalid-feedback">
+                            <span th:errors="*{username}"></span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-12">
                         <label for="image" class="form-label">Image</label>
-                        <input type="file" th:field="*{image}" class="form-control form-control-lg" id="image">
+                        <input type="file" th:field="*{image}"
+                               th:class="${#fields.hasErrors('image') ? 'form-control is-invalid' : 'form-control form-control-lg'}"
+                               id="image">
+                        <div th:if="${#fields.hasErrors('image')}" class="invalid-feedback">
+                            <span th:errors="*{image}"></span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-12">
-                        <label for="exampleInputEmail1" class="form-label">Email address</label>
-                        <input type="email" th:field="*{email}" class="form-control form-control-lg"
-                               id="exampleInputEmail1">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" th:field="*{email}"
+                               th:class="${#fields.hasErrors('email') ? 'form-control is-invalid' : 'form-control form-control-lg'}"
+                               id="email">
+                        <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback">
+                            <span th:errors="*{email}"></span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-12">
                         <label for="phone" class="form-label">Phone</label>
-                        <input type="text" th:field="*{phone}" class="form-control form-control-lg" id="phone">
+                        <input type="text" th:field="*{phone}"
+                               th:class="${#fields.hasErrors('phone') ? 'form-control is-invalid' : 'form-control form-control-lg'}"
+                               id="phone">
+                        <div th:if="${#fields.hasErrors('phone')}" class="invalid-feedback">
+                            <span th:errors="*{phone}"></span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-12">
                         <label for="departments" class="form-label">Department</label>
-                        <select class="form-select form-select-lg" th:field="*{departmentId}" id="departments">
+                        <select th:field="*{departmentId}"
+                                th:class="${#fields.hasErrors('departmentId') ? 'form-select is-invalid' : 'form-select form-select-lg'}"
+                                id="departments">
                             <option value="" selected>Choose a department</option>
                             <option th:each="department : ${departments}"
                                     th:value="${department.id}"
@@ -59,12 +80,18 @@
                                     th:selected="${user.departmentId == department.id}">
                             </option>
                         </select>
+                        <div th:if="${#fields.hasErrors('departmentId')}" class="invalid-feedback">
+                            <span th:errors="*{departmentId}"></span>
+                        </div>
                     </div>
                 </div>
+
                 <div class="row mb-3">
                     <div class="col-12">
                         <label for="role" class="form-label">Role</label>
-                        <select class="form-select form-select-lg" th:field="*{roleId}" id="role">
+                        <select th:field="*{roleId}"
+                                th:class="${#fields.hasErrors('roleId') ? 'form-select is-invalid' : 'form-select form-select-lg'}"
+                                id="role">
                             <option value="" selected>Choose a role</option>
                             <option th:each="role : ${roles}"
                                     th:value="${role.id}"
@@ -72,6 +99,9 @@
                                     th:selected="${user.roleId == role.id}">
                             </option>
                         </select>
+                        <div th:if="${#fields.hasErrors('roleId')}" class="invalid-feedback">
+                            <span th:errors="*{roleId}"></span>
+                        </div>
                     </div>
                 </div>
 

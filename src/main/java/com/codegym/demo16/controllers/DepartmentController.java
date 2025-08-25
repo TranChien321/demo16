@@ -4,6 +4,8 @@ import com.codegym.demo16.dto.DepartmentDTO;
 import com.codegym.demo16.services.DepartmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -47,9 +49,18 @@ public class DepartmentController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateDepartment(@PathVariable("id") Long id,
-                                   @ModelAttribute("department") DepartmentDTO departmentDTO,
-                                   RedirectAttributes redirectAttributes) {
+    public String updateDepartment(
+            @PathVariable("id") Long id,
+            @Validated @ModelAttribute("department") DepartmentDTO departmentDTO,
+            BindingResult result,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("department", departmentDTO);
+            return "departments/edit"; // quay lại form edit nếu có lỗi
+        }
+
         try {
             departmentDTO.setId(id);
             departmentService.editDepartment(departmentDTO);
@@ -60,6 +71,7 @@ public class DepartmentController {
         return "redirect:/departments";
     }
 
+
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("department", new DepartmentDTO());
@@ -67,15 +79,23 @@ public class DepartmentController {
     }
 
     @PostMapping("/create")
-    public String createDepartment(@ModelAttribute("department") DepartmentDTO departmentDTO,
-                                   RedirectAttributes redirectAttributes) {
+    public String createDepartment(
+            @Validated @ModelAttribute("department") DepartmentDTO departmentDTO,
+            BindingResult result,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("department", departmentDTO);
+            return "departments/create"; // quay lại form nếu lỗi
+        }
         try {
             departmentService.createDepartment(departmentDTO);
             redirectAttributes.addFlashAttribute("success", "Thêm phòng ban thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Không thể thêm phòng ban!");
         }
-        return "redirect:/departments"; // về lại danh sách
+        return "redirect:/departments";
     }
 
 }

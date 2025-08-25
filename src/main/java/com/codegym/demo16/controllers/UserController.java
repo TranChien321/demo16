@@ -11,6 +11,8 @@ import com.codegym.demo16.services.RoleService;
 import com.codegym.demo16.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -78,9 +80,14 @@ public class UserController {
 //
 
     //
-    @PostMapping("/store")
-    public String storeUser(@ModelAttribute("user") CreateUserDTO
-                                    createUserDTO) throws IOException {
+    @PostMapping("/create")
+    public String storeUser(@Validated @ModelAttribute("user") CreateUserDTO
+                                    createUserDTO, BindingResult result, Model model ) throws IOException {
+        if (result.hasErrors()){
+            List<DepartmentDTO> departments = departmentService.getAllDepartments();
+            model.addAttribute("departments", departments);
+            return "users/create";
+        }
         // Logic to store a new user
         userService.storeUser(createUserDTO);
         return "redirect:/users";
@@ -116,12 +123,25 @@ public class UserController {
     //
     @PostMapping("/{id}/update")
     public String updateUser(@PathVariable("id") int id,
-                             @ModelAttribute("user") EditUserDTO editUserDTO) throws IOException {
-        UserDTO user = userService.getUserById(id);
-        if (user == null) {
+                             @Validated @ModelAttribute("user") EditUserDTO editUserDTO,
+                             BindingResult result,
+                             Model model) throws IOException {
+        UserDTO existingUser = userService.getUserById(id);
+        if (existingUser == null) {
             return "redirect:/users"; // Redirect if user not found
         }
+
+        if (result.hasErrors()) {
+            // Nếu có lỗi, nạp lại các dữ liệu cần thiết cho form
+            List<DepartmentDTO> departments = departmentService.getAllDepartments();
+            List<RoleDTO> roles = roleService.getAllRoles();
+            model.addAttribute("departments", departments);
+            model.addAttribute("roles", roles);
+            return "users/edit"; // Trả lại view edit với các lỗi validation
+        }
+
         userService.updateUser(id, editUserDTO);
         return "redirect:/users";
     }
+
 }

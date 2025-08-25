@@ -1,14 +1,28 @@
 package com.codegym.demo16.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import com.codegym.demo16.validations.custom.UniqueEmail;
+import com.codegym.demo16.validations.custom.ValidImage;
+import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public class CreateUserDTO {
+    @NotBlank(message = "Username is required")
     private String username;
+
+    @NotBlank(message = "Password is required")
+    @Min(value = 6, message = "Password must be at least 6 characters long")
+    @Max(value = 32, message = "Password must not exceed 20 characters")
     private String password;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @UniqueEmail(message = "Email address already exists")
     private String email;
+
+    @NotBlank(message = "Phone number is required")
     private String phone;
+
+    @ValidImage(message = "Only PNG, JPG, JPEG are allowed")
     private MultipartFile image;
     private Long departmentId;
     private Long roleId;
