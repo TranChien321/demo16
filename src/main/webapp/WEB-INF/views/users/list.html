@@ -55,6 +55,7 @@
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Department</th>
+                        <th>Role</th> <!-- thêm cột -->
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -68,6 +69,7 @@
                         <td th:text="${user.getEmail()}"></td>
                         <td th:text="${user.getPhone()}"></td>
                         <td th:text="${user.getDepartmentName()}"></td>
+                        <td th:text="${user.getRoleName()}"></td> <!-- hiển thị tên role -->
                         <td>
                             <a class="btn btn-sm btn-info" th:href="@{/users/{id}/detail(id=${user.getId()})}">
                                 <i class="fa fa-eye"></i>

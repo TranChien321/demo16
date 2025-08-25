@@ -1,5 +1,7 @@
 package com.codegym.demo16.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
 public class CreateUserDTO {
@@ -9,6 +11,7 @@ public class CreateUserDTO {
     private String phone;
     private MultipartFile image;
     private Long departmentId;
+    private Long roleId;
 
     public CreateUserDTO() {
     }
@@ -66,5 +69,13 @@ public class CreateUserDTO {
 
     public void setDepartmentId(Long departmentId) {
         this.departmentId = departmentId;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
     }
 }

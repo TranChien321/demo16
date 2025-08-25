@@ -1,8 +1,18 @@
 package com.codegym.demo16.dto;
 
+import com.codegym.demo16.models.User;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class DepartmentDTO {
     private Long id;
     private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<User> users = new ArrayList<>();
 
     public DepartmentDTO() {
     }
@@ -26,5 +36,13 @@ public class DepartmentDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

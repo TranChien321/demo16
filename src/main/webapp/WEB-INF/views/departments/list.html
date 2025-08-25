@@ -1,0 +1,69 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Department List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .table th {
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+        }
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<section layout:fragment="content">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">🏢 Department List</h2>
+            <a class="btn btn-success" href="/departments/create">
+                <i class="fa fa-plus"></i> Add Department
+            </a>
+        </div>
+
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <table class="table table-hover table-bordered align-middle text-center">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Department ID</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="dep, stat : ${departments}">
+                        <td th:text="${stat.index + 1}"></td>
+                        <td th:text="${dep.id}"></td>
+                        <td th:text="${dep.name}"></td>
+                        <td>
+                            <a class="btn btn-sm btn-info" th:href="@{/departments/{id}/detail(id=${dep.id})}">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a class="btn btn-sm btn-primary" th:href="@{/departments/{id}/edit(id=${dep.id})}">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure?')"
+                               th:href="@{/departments/{id}/delete(id=${dep.id})}">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(departments)}">
+                        <td colspan="4" class="text-center text-muted">No departments found</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+</html>

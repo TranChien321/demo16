@@ -9,6 +9,7 @@ public class EditUserDTO {
     private String phone;
     private MultipartFile image;
     private Long departmentId;
+    private Long roleId;
 
     public EditUserDTO() {
     }
@@ -66,5 +67,13 @@ public class EditUserDTO {
 
     public void setDepartmentId(Long departmentId) {
         this.departmentId = departmentId;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
     }
 }

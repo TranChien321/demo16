@@ -28,4 +28,32 @@ public class DepartmentService {
         }
         return list;
     }
+
+    //xoá department by id
+    public void deleteDepartment(Long id) {
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+
+        if (!department.getUsers().isEmpty()) {
+            throw new RuntimeException("Cannot delete department because it has users!");
+        }
+
+        departmentRepository.deleteById(id);
+    }
+
+    //Edit department
+    public void editDepartment(DepartmentDTO departmentDTO) {
+        Department department = departmentRepository.findById(departmentDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+        department.setName(departmentDTO.getName());
+        departmentRepository.save(department);
+    }
+
+
+    //Create department
+    public void createDepartment(DepartmentDTO departmentDTO) {
+        Department department = new Department();
+        department.setName(departmentDTO.getName());
+        departmentRepository.save(department);
+    }
 }

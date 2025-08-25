@@ -4,8 +4,10 @@ import com.codegym.demo16.dto.CreateUserDTO;
 import com.codegym.demo16.dto.DepartmentDTO;
 import com.codegym.demo16.dto.EditUserDTO;
 import com.codegym.demo16.dto.UserDTO;
-import com.codegym.demo16.dto.response.ListUserResponse;
+import com.codegym.demo16.dto.RoleDTO;
+import com.codegym.demo16.dto.response.ListDepartmentResponse;
 import com.codegym.demo16.services.DepartmentService;
+import com.codegym.demo16.services.RoleService;
 import com.codegym.demo16.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,13 +21,14 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final DepartmentService departmentService;
+    private final RoleService roleService;
 
-    public UserController(UserService userService, DepartmentService departmentService) {
+    public UserController(UserService userService, DepartmentService departmentService, RoleService roleService) {
         this.userService = userService;
         this.departmentService = departmentService;
+        this.roleService = roleService;
     }
-    // This controller can handle user-related requests
-    // Add methods to handle user operations like listing, creating, updating, and deleting users
+
 
     @GetMapping
     public String listUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -36,7 +39,7 @@ public class UserController {
         } else {
             page -= 1; // Convert to zero-based index for pagination
         }
-        ListUserResponse listUserResponse = userService.getAllUsers(page, size);
+        ListDepartmentResponse listUserResponse = userService.getAllUsers(page, size);
         List<UserDTO> users = listUserResponse.getUsers();
         // Logic to list users
         model.addAttribute("users", users);
@@ -48,11 +51,15 @@ public class UserController {
     public String createUser(Model model) {
         CreateUserDTO createUserDTO = new CreateUserDTO();
         List<DepartmentDTO> departments = departmentService.getAllDepartments();
+        List<RoleDTO> roles = roleService.getAllRoles(); // ✅ sửa thành RoleDTO
+
         model.addAttribute("departments", departments);
+        model.addAttribute("roles", roles); // ✅ dùng "roles" giống edit
         model.addAttribute("user", createUserDTO);
-        // Logic to create a new user
-        return "users/create"; // This will resolve to /WEB-INF/views/users/create.html
+
+        return "users/create";
     }
+
 
     @GetMapping("/{id}/detail")
     public String userDetail(@PathVariable("id") String id,
@@ -68,6 +75,8 @@ public class UserController {
         // For now, just redirect to the list of users
         return "redirect:/users";
     }
+//
+
     //
     @PostMapping("/store")
     public String storeUser(@ModelAttribute("user") CreateUserDTO
@@ -77,30 +86,33 @@ public class UserController {
         return "redirect:/users";
     }
     //
+
     @GetMapping("/{id}/edit")
     public String showFormEdit(@PathVariable("id") int id, Model model) {
         UserDTO user = userService.getUserById(id);
         if (user == null) {
-            return "redirect:/users"; // Redirect if user not found
+            return "redirect:/users";
         }
 
-        // Prepare the EditUserDTO with the user's current details
         EditUserDTO editUserDTO = new EditUserDTO(
-                user.getId(),
+                Math.toIntExact(user.getId()),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPhone()
         );
         editUserDTO.setDepartmentId(user.getDepartmentId());
+        editUserDTO.setRoleId(user.getRoleId()); // 🔥 Sửa ở đây
 
         List<DepartmentDTO> departments = departmentService.getAllDepartments();
+        List<RoleDTO> roles = roleService.getAllRoles();
 
-        // Add the EditUserDTO to the model
         model.addAttribute("user", editUserDTO);
         model.addAttribute("departments", departments);
+        model.addAttribute("roles", roles);
 
-        return "users/edit"; // This will resolve to /WEB-INF/views/users/edit.html
+        return "users/edit";
     }
+
     //
     @PostMapping("/{id}/update")
     public String updateUser(@PathVariable("id") int id,

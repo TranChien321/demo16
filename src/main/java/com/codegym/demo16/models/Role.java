@@ -1,30 +1,32 @@
 package com.codegym.demo16.models;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Entity
-@Table(name = "departments")
-public class Department {
+@Table(name = "roles")
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(nullable = false, unique = true)
+    private String name; // ADMIN, USER, MANAGER...
 
-    // 1 Department có nhiều User
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<User> users = new ArrayList<>();
+    private String description;
 
+    // Quan hệ 1 Role - N Users
+    @OneToMany(mappedBy = "role")
+    private java.util.List<User> users;
 
-    public Department() {
+    public Role() {
     }
 
-    public Department(Long id, String name) {
+    public Role(Long id, String name, String description) {
         this.id = id;
         this.name = name;
+        this.description = description;
     }
 
     public Long getId() {
@@ -43,7 +45,14 @@ public class Department {
         this.name = name;
     }
 
-    // ✅ Thêm getter/setter cho users
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public List<User> getUsers() {
         return users;
     }

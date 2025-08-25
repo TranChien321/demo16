@@ -32,6 +32,10 @@ public class User {
     public User() {
     }
 
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
     public Long getId() {
         return id;
     }
@@ -86,5 +90,13 @@ public class User {
 
     public Department getDepartment() {
         return department;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
