@@ -72,9 +72,9 @@ public class UserService {
         return listUserResponse;
     }
 
-    public void deleteById(int id){
+    public void deleteById(int id) {
         // Logic to delete a user by ID
-        Optional<User> user = userRepository.findById((long)(id));
+        Optional<User> user = userRepository.findById((long) (id));
         if (user.isPresent()) {
             User currentUser = user.get();
             // delete image
@@ -136,7 +136,7 @@ public class UserService {
         if (user.isPresent()) {
             User currentUser = user.get();
             UserDTO userDTO = new UserDTO();
-            userDTO.setId( currentUser.getId().intValue());
+            userDTO.setId(currentUser.getId().intValue());
             userDTO.setUsername(currentUser.getName());
             userDTO.setEmail(currentUser.getEmail());
             userDTO.setPhone(currentUser.getPhone());
@@ -185,5 +185,26 @@ public class UserService {
 
             userRepository.save(currentUser);
         }
+    }
+
+    //tìm kếm user theo tên, email, sđt
+    public List<UserDTO> searchUsers(String query) {
+        List<User> users = userRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(query, query, query);
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for (User user : users) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(user.getId().intValue());
+            userDTO.setUsername(user.getName());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setPhone(user.getPhone());
+            userDTO.setImageUrl(user.getImageUrl());
+            String nameDepartment = user.getDepartment() != null ? user.getDepartment().getName() : "No Department";
+            userDTO.setDepartmentName(nameDepartment);
+            String roleName = user.getRole() != null ? user.getRole().getName()
+                    : "No Role";
+            userDTO.setRoleName(roleName);
+            userDTOs.add(userDTO);
+        }
+        return userDTOs;
     }
 }

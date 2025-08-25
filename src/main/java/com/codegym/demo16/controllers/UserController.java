@@ -144,4 +144,18 @@ public class UserController {
         return "redirect:/users";
     }
 
+    // Tìm kiếm người dùng theo (tên, email, sđt)  nếu không có tham số thì trả về danh sách bình thường
+    @GetMapping("/search")
+    public String searchUsers(@RequestParam(value = "query", required = false) String query,
+                              Model model) {
+        List<UserDTO> users;
+        if (query != null && !query.trim().isEmpty()) {
+            users = userService.searchUsers(query.trim());
+        } else {
+            users = userService.getAllUsers(0, 100).getUsers(); // Giới hạn 100 để tránh quá tải
+        }
+        model.addAttribute("users", users);
+        return "users/list";
+    }
+
 }

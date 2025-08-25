@@ -36,15 +36,24 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">👤 User List</h2>
-            <a class="btn btn-success" href="/users/create">
-                <i class="fa fa-plus"></i> Create User
-            </a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">👤 User List</h2>
+        <div>
+            <!-- Form Search -->
+            <form class="d-flex" th:action="@{/users/search}" method="get">
+                <input class="form-control me-2" type="text" name="query" placeholder="Search user...">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fa fa-search"></i> Search
+                </button>
+            </form>
         </div>
+        <a class="btn btn-success ms-3" href="/users/create">
+            <i class="fa fa-plus"></i> Create User
+        </a>
+    </div>
 
-        <div class="card shadow-lg">
+
+    <div class="card shadow-lg">
             <div class="card-body">
                 <table class="table table-hover table-bordered align-middle text-center">
                     <thead class="table-dark">
