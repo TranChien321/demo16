@@ -9,6 +9,12 @@ import com.codegym.demo16.dto.response.ListDepartmentResponse;
 import com.codegym.demo16.services.DepartmentService;
 import com.codegym.demo16.services.RoleService;
 import com.codegym.demo16.services.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,30 +30,63 @@ public class UserController {
     private final UserService userService;
     private final DepartmentService departmentService;
     private final RoleService roleService;
+    private final HttpSession httpSession;
 
-    public UserController(UserService userService, DepartmentService departmentService, RoleService roleService) {
+
+    public UserController(UserService userService, DepartmentService departmentService, RoleService roleService, HttpSession httpSession) {
         this.userService = userService;
         this.departmentService = departmentService;
         this.roleService = roleService;
+        this.httpSession = httpSession;
+
     }
 
 
     @GetMapping
-    public String listUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+    public String listUsers(@CookieValue(value = "counter", defaultValue = "1") String counter,
+                            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
                             @RequestParam(value = "size", required = false, defaultValue = "5") int size,
-                            Model model) {
+                            @RequestParam(value = "departmentId", required = false) Long departmentId,
+                            Model model,
+                            HttpServletResponse response) {
         if (page < 1) {
-            page = 1; // Ensure page number is at least 1
+            page = 1;
         } else {
-            page -= 1; // Convert to zero-based index for pagination
+            page -= 1;
         }
-        ListDepartmentResponse listUserResponse = userService.getAllUsers(page, size);
-        List<UserDTO> users = listUserResponse.getUsers();
-        // Logic to list users
+
+        Cookie myCookie = new Cookie("msg", "Hello");
+        int total = Integer.parseInt(counter) + 1;
+        Cookie counterViewPage = new Cookie("counter", total + "");
+        myCookie.setMaxAge(60);
+        counterViewPage.setMaxAge(60);
+        response.addCookie(myCookie);
+        response.addCookie(counterViewPage);
+
+        List<UserDTO> users;
+        int totalPages;
+
+        if (departmentId != null) {
+            users = userService.filterUsersByDepartment(departmentId, page, size);
+            totalPages = 1; // nếu lọc thì không cần nhiều trang, hoặc bạn tự tính lại
+        } else {
+            ListDepartmentResponse listUserResponse = userService.getAllUsers(page, size);
+            users = listUserResponse.getUsers();
+            totalPages = listUserResponse.getTotalPage();
+        }
+
         model.addAttribute("users", users);
-        model.addAttribute("totalPages", listUserResponse.getTotalPage());
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalViewPage", counter);
+
+        // Gửi list department xuống để vẽ dropdown lọc
+        model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("selectedDepartmentId", departmentId);
+
         return "users/list";
     }
+
+
 
     @GetMapping("/create")
     public String createUser(Model model) {
@@ -70,12 +109,20 @@ public class UserController {
         return "users/detail"; // This will resolve to /WEB-INF/views/users/detail.html
     }
 
+
     @GetMapping("/{id}/delete")
     public String deleteUser(@PathVariable("id") int id) {
-        // Logic to delete a user by ID
-        userService.deleteById(id);
-        // For now, just redirect to the list of users
+        UserDTO user = userService.getUserById(id);
+        if (user == null) {
+            return "errors/404";
+        }
+        userService.deleteUser(id);
         return "redirect:/users";
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public String handlerRuntimeException(){
+        return "errors/500";
     }
 //
 
@@ -98,7 +145,7 @@ public class UserController {
     public String showFormEdit(@PathVariable("id") int id, Model model) {
         UserDTO user = userService.getUserById(id);
         if (user == null) {
-            return "redirect:/users";
+            return "errors/404";
         }
 
         EditUserDTO editUserDTO = new EditUserDTO(
@@ -128,7 +175,7 @@ public class UserController {
                              Model model) throws IOException {
         UserDTO existingUser = userService.getUserById(id);
         if (existingUser == null) {
-            return "redirect:/users"; // Redirect if user not found
+            return "errors/404"; // Redirect if user not found
         }
 
         if (result.hasErrors()) {
@@ -144,17 +191,29 @@ public class UserController {
         return "redirect:/users";
     }
 
-    // Tìm kiếm người dùng theo (tên, email, sđt)  nếu không có tham số thì trả về danh sách bình thường
     @GetMapping("/search")
     public String searchUsers(@RequestParam(value = "query", required = false) String query,
+                              @RequestParam(value = "page", defaultValue = "0") int page,
+                              @RequestParam(value = "size", defaultValue = "10") int size,
                               Model model) {
-        List<UserDTO> users;
+
         if (query != null && !query.trim().isEmpty()) {
-            users = userService.searchUsers(query.trim());
+            Pageable pageable = PageRequest.of(page, size);
+            Page<UserDTO> usersPage = userService.searchUsers(query.trim(), pageable);
+            model.addAttribute("users", usersPage.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", usersPage.getTotalPages());
         } else {
-            users = userService.getAllUsers(0, 100).getUsers(); // Giới hạn 100 để tránh quá tải
+            ListDepartmentResponse listResp = userService.getAllUsers(page, size);
+            model.addAttribute("users", listResp.getUsers());
+            model.addAttribute("currentPage", listResp.getCurrentPage());
+            model.addAttribute("totalPages", listResp.getTotalPage());
         }
-        model.addAttribute("users", users);
+
+        model.addAttribute("query", query);
+        model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("roles", roleService.getAllRoles());
+
         return "users/list";
     }
 

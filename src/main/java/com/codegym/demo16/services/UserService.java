@@ -72,16 +72,18 @@ public class UserService {
         return listUserResponse;
     }
 
-    public void deleteById(int id) {
-        // Logic to delete a user by ID
-        Optional<User> user = userRepository.findById((long) (id));
+    //xoá user + file ảnh
+    public void deleteUser(int id) {
+        Optional<User> user = userRepository.findById((long) id);
         if (user.isPresent()) {
             User currentUser = user.get();
-            // delete image
-            fileManager.deleteFile(UPLOAD_DIR + "/" + currentUser.getImageUrl());
-            userRepository.delete(currentUser);
-        } else {
-            throw new RuntimeException("User not found with id: " + id);
+            // Xoá file ảnh
+            String imageUrl = currentUser.getImageUrl();
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                fileManager.deleteFile(UPLOAD_DIR + "/" + imageUrl);
+            }
+            // Xoá user khỏi DB
+            userRepository.deleteById((long) id);
         }
     }
 
@@ -182,16 +184,16 @@ public class UserService {
                     currentUser.setRole(role);
                 }
             }
-
             userRepository.save(currentUser);
         }
     }
 
-    //tìm kếm user theo tên, email, sđt
-    public List<UserDTO> searchUsers(String query) {
-        List<User> users = userRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(query, query, query);
-        List<UserDTO> userDTOs = new ArrayList<>();
-        for (User user : users) {
+    public Page<UserDTO> searchUsers(String query, Pageable pageable) {
+        Page<User> users = userRepository
+                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrPhoneContainingIgnoreCase(
+                        query, query, query, pageable);
+
+        return users.map(user -> {
             UserDTO userDTO = new UserDTO();
             userDTO.setId(user.getId().intValue());
             userDTO.setUsername(user.getName());
@@ -200,11 +202,27 @@ public class UserService {
             userDTO.setImageUrl(user.getImageUrl());
             String nameDepartment = user.getDepartment() != null ? user.getDepartment().getName() : "No Department";
             userDTO.setDepartmentName(nameDepartment);
-            String roleName = user.getRole() != null ? user.getRole().getName()
-                    : "No Role";
+            String roleName = user.getRole() != null ? user.getRole().getName() : "No Role";
             userDTO.setRoleName(roleName);
-            userDTOs.add(userDTO);
-        }
-        return userDTOs;
+            return userDTO;
+        });
     }
+
+    public List<UserDTO> filterUsersByDepartment(Long departmentId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userRepository.findByDepartmentId(departmentId, pageable);
+
+        return users.stream().map(user -> {
+            UserDTO dto = new UserDTO();
+            dto.setId(user.getId().intValue());
+            dto.setUsername(user.getName());
+            dto.setEmail(user.getEmail());
+            dto.setPhone(user.getPhone());
+            dto.setImageUrl(user.getImageUrl());
+            dto.setDepartmentName(user.getDepartment() != null ? user.getDepartment().getName() : "No Department");
+            dto.setRoleName(user.getRole() != null ? user.getRole().getName() : "No Role");
+            return dto;
+        }).toList();
+    }
+
 }

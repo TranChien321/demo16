@@ -93,13 +93,23 @@
                     </ul>
                 </li>
             </ul>
+            <!-- Nếu đã login -->
+            <li th:if="${session.username != null}" class="nav-item d-flex align-items-center">
+                <a class="nav-link disabled text-white" aria-disabled="true">
+                    Xin chào <span th:text="${session.username}"></span>
+                </a>
+                <a href="/auth/logout" class="btn btn-danger btn-sm ms-2">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
 
-            <!-- Login -->
-            <div class="d-flex">
+            <!-- Nếu chưa login -->
+            <li th:if="${session.username == null}" class="nav-item">
                 <a href="/auth/login" class="btn btn-warning">
                     <i class="bi bi-box-arrow-in-right"></i> Login
                 </a>
-            </div>
+            </li>
+        </div>
         </div>
     </div>
 </nav>

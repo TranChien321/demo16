@@ -24,6 +24,7 @@ public class CreateUserDTO {
 
     @ValidImage(message = "Only PNG, JPG, JPEG are allowed")
     private MultipartFile image;
+
     private Long departmentId;
     private Long roleId;
 
