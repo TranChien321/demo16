@@ -5,6 +5,7 @@ import com.codegym.demo16.dto.CreateUserDTO;
 import com.codegym.demo16.dto.EditUserDTO;
 import com.codegym.demo16.dto.UserDTO;
 import com.codegym.demo16.dto.response.ListDepartmentResponse;
+import com.codegym.demo16.dto.response.ListUserResponse;
 import com.codegym.demo16.models.Department;
 import com.codegym.demo16.models.Role;
 import com.codegym.demo16.models.User;
@@ -37,7 +38,7 @@ public class UserService {
         this.roleRepository = roleRepository;
     }
 
-    public ListDepartmentResponse getAllUsers(int pageNumber, int pageSize) {
+    public ListUserResponse getAllUsers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("id").ascending());
         Page<User> data = userRepository.findAll(pageable);
         System.out.println("Total page: " + data.getTotalPages());
@@ -64,7 +65,7 @@ public class UserService {
             userDTOs.add(userDTO);
         }
 
-        ListDepartmentResponse listUserResponse = new ListDepartmentResponse();
+        ListUserResponse listUserResponse = new ListUserResponse();
         listUserResponse.setTotalPage(data.getTotalPages());
         listUserResponse.setCurrentPage(data.getNumber());
         listUserResponse.setUsers(userDTOs);
@@ -87,7 +88,7 @@ public class UserService {
         }
     }
 
-    public void storeUser(CreateUserDTO createUserDTO) throws IOException {
+    public void storeUser(CreateUserDTO createUserDTO) {
         // Lấy dữ liệu từ DTO
         String username = createUserDTO.getUsername();
         String password = createUserDTO.getPassword();
@@ -151,7 +152,7 @@ public class UserService {
     }
 
     //
-    public void updateUser(int id, EditUserDTO editUserDTO) throws IOException {
+    public void updateUser(int id, EditUserDTO editUserDTO) {
         Optional<User> user = userRepository.findById((long) id);
         if (user.isPresent()) {
             // Update user details

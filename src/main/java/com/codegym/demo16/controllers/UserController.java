@@ -6,6 +6,7 @@ import com.codegym.demo16.dto.EditUserDTO;
 import com.codegym.demo16.dto.UserDTO;
 import com.codegym.demo16.dto.RoleDTO;
 import com.codegym.demo16.dto.response.ListDepartmentResponse;
+import com.codegym.demo16.dto.response.ListUserResponse;
 import com.codegym.demo16.services.DepartmentService;
 import com.codegym.demo16.services.RoleService;
 import com.codegym.demo16.services.UserService;
@@ -20,6 +21,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -70,7 +73,7 @@ public class UserController {
             users = userService.filterUsersByDepartment(departmentId, page, size);
             totalPages = 1; // nếu lọc thì không cần nhiều trang, hoặc bạn tự tính lại
         } else {
-            ListDepartmentResponse listUserResponse = userService.getAllUsers(page, size);
+            ListUserResponse listUserResponse = userService.getAllUsers(page, size);
             users = listUserResponse.getUsers();
             totalPages = listUserResponse.getTotalPage();
         }
@@ -119,7 +122,6 @@ public class UserController {
         userService.deleteUser(id);
         return "redirect:/users";
     }
-
     @ExceptionHandler(RuntimeException.class)
     public String handlerRuntimeException(){
         return "errors/500";
@@ -137,7 +139,7 @@ public class UserController {
         }
         // Logic to store a new user
         userService.storeUser(createUserDTO);
-        return "redirect:/users";
+        return "errors/404";
     }
     //
 
@@ -204,7 +206,7 @@ public class UserController {
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", usersPage.getTotalPages());
         } else {
-            ListDepartmentResponse listResp = userService.getAllUsers(page, size);
+           ListUserResponse listResp = userService.getAllUsers(page, size);
             model.addAttribute("users", listResp.getUsers());
             model.addAttribute("currentPage", listResp.getCurrentPage());
             model.addAttribute("totalPages", listResp.getTotalPage());
