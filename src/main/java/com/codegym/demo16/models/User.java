@@ -24,7 +24,6 @@ public class User {
     @Column(nullable = true)
     private String imageUrl;
 
-    // relationship with Department can be added here if needed
     @ManyToOne
     @JoinColumn(name = "department_id", nullable = true)
     private Department department;
@@ -32,9 +31,13 @@ public class User {
     public User() {
     }
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private java.util.Set<Role> roles = new java.util.HashSet<>();
 
     public Long getId() {
         return id;
@@ -92,11 +95,11 @@ public class User {
         return department;
     }
 
-    public Role getRole() {
-        return role;
+    public java.util.Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setRoles(java.util.Set<Role> roles) {
+        this.roles = roles;
     }
 }

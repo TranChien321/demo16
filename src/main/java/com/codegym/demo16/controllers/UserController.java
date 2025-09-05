@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,7 +30,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/admin/users")
 public class UserController {
     private final UserService userService;
     private final DepartmentService departmentService;
@@ -65,6 +67,10 @@ public class UserController {
         counterViewPage.setMaxAge(60);
         response.addCookie(myCookie);
         response.addCookie(counterViewPage);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        httpSession.setAttribute("email", email);
 
         List<UserDTO> users;
         int totalPages;
@@ -115,33 +121,37 @@ public class UserController {
 
     @GetMapping("/{id}/delete")
     public String deleteUser(@PathVariable("id") int id) {
+        System.out.println(">>> Delete request for ID: " + id);
         UserDTO user = userService.getUserById(id);
         if (user == null) {
+            System.out.println(">>> User not found!");
             return "errors/404";
         }
         userService.deleteUser(id);
-        return "redirect:/users";
+        return "redirect:/admin/users";
     }
-    @ExceptionHandler(RuntimeException.class)
-    public String handlerRuntimeException(){
-        return "errors/500";
-    }
+
 //
 
-    //
     @PostMapping("/create")
-    public String storeUser(@Validated @ModelAttribute("user") CreateUserDTO
-                                    createUserDTO, BindingResult result, Model model ) throws IOException {
-        if (result.hasErrors()){
+    public String storeUser(@Validated @ModelAttribute("user") CreateUserDTO createUserDTO,
+                            BindingResult result,
+                            Model model) throws IOException {
+        if (result.hasErrors()) {
             List<DepartmentDTO> departments = departmentService.getAllDepartments();
+            List<RoleDTO> roles = roleService.getAllRoles();
             model.addAttribute("departments", departments);
+            model.addAttribute("roles", roles);
+            // Ensure the form reloads with the submitted data and errors
+            model.addAttribute("user", createUserDTO);
             return "users/create";
         }
-        // Logic to store a new user
+
+        // Nếu không có lỗi thì lưu user
         userService.storeUser(createUserDTO);
-        return "errors/404";
+        return "redirect:/admin/users";
     }
-    //
+
 
     @GetMapping("/{id}/edit")
     public String showFormEdit(@PathVariable("id") int id, Model model) {
@@ -190,7 +200,7 @@ public class UserController {
         }
 
         userService.updateUser(id, editUserDTO);
-        return "redirect:/users";
+        return "redirect:/admin/users";
     }
 
     @GetMapping("/search")
@@ -218,5 +228,4 @@ public class UserController {
 
         return "users/list";
     }
-
 }

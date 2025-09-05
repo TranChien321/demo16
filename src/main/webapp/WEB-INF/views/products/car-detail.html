@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${carName}"></title>
+</head>
+<body>
+<section layout:fragment="content">
+<h1>Thông tin chi tiết xe: <span th:text="${carName}"></span></h1>
+<img th:src="@{/resources/static/img/{car}.jpg(car=${carName})}"
+     th:alt="${carName}" style="max-width:400px;">
+<p>Đây là trang chi tiết cho dòng xe <span th:text="${carName}"></span>.</p>
+</section>
+</body>
+</html>

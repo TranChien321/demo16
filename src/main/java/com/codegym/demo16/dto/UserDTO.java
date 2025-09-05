@@ -106,7 +106,11 @@ public class UserDTO {
         if (roleId == null || roleId.trim().isEmpty()) {
             return null;
         }
-        return Long.parseLong(roleId);
+        try {
+            return Long.parseLong(roleId);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public void setRoleId(String roleId) {

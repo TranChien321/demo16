@@ -14,8 +14,7 @@
             <h5 class="mb-0">Create User</h5>
         </div>
         <div class="card-body">
-            <form th:object="${user}" class="form"
-                  th:action="@{/users/create}" method="post" enctype="multipart/form-data">
+            <form th:object="${user}" class="form" th:action="@{/admin/users/create}" method="post" enctype="multipart/form-data">
 
                 <!-- Username -->
                 <div class="row mb-3">
@@ -120,7 +119,7 @@
 
                 <div class="d-flex justify-content-between">
                     <button type="submit" class="btn btn-success btn-lg px-4">Create</button>
-                    <a href="/users" class="btn btn-secondary btn-lg px-4">Back to list</a>
+                    <a href="/admin/users" class="btn btn-secondary btn-lg px-4">Back to list</a>
                 </div>
             </form>
         </div>

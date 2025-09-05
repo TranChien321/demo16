@@ -16,9 +16,9 @@ public class Role {
 
     private String description;
 
-    // Quan hệ 1 Role - N Users
-    @OneToMany(mappedBy = "role")
-    private java.util.List<User> users;
+    // Quan hệ N Role - N Users
+    @ManyToMany(mappedBy = "roles")
+    private java.util.Set<User> users;
 
     public Role() {
     }
@@ -53,11 +53,11 @@ public class Role {
         this.description = description;
     }
 
-    public List<User> getUsers() {
+    public java.util.Set<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(java.util.Set<User> users) {
         this.users = users;
     }
 }

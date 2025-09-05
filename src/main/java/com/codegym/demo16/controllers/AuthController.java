@@ -33,18 +33,6 @@ public class AuthController {
         return "auth/login"; // This will resolve to /WEB-INF/views/login.html
     }
 
-    @PostMapping("/login")
-    public String submitLogin(@RequestParam("username") String username,
-                              @RequestParam("password") String password) {
-        if (!authService.checkAccount(username, password)) {
-            return "redirect:/auth/login?error=true";
-        }
-
-        // tao session luu thong tin dang nhap
-        httpSession.setAttribute("username", "admin");
-        return "redirect:/home";
-    }
-
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate(); // Xoá toàn bộ session

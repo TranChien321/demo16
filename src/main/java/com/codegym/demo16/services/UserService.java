@@ -1,4 +1,3 @@
-
 package com.codegym.demo16.services;
 
 import com.codegym.demo16.dto.CreateUserDTO;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.codegym.demo16.repositories.IRoleRepository;
 
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -57,8 +55,11 @@ public class UserService {
             String nameDepartment = user.getDepartment() != null ? user.getDepartment().getName() : "No Department";
             userDTO.setDepartmentName(nameDepartment);
 
-
-            String roleName = user.getRole() != null ? user.getRole().getName() : "No Role";
+            // Fix: Handle multiple roles
+            String roleName = "No Role";
+            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                roleName = user.getRoles().iterator().next().getName(); // get first role name
+            }
             userDTO.setRoleName(roleName);
 
 
@@ -123,8 +124,9 @@ public class UserService {
         if (roleId != null) {
             Role role = roleRepository.findById(roleId)
                     .orElseThrow(() -> new RuntimeException("Role not found"));
-            newUser.setRole(role);
-
+            Set<Role> roles = new HashSet<>();
+            roles.add(role);
+            newUser.setRoles(roles); // Fix: setRoles instead of setRole
         } else {
             throw new RuntimeException("Role is required");
         }
@@ -145,7 +147,12 @@ public class UserService {
             userDTO.setPhone(currentUser.getPhone());
             userDTO.setImageUrl(currentUser.getImageUrl());
             userDTO.setDepartmentId(currentUser.getDepartment() != null ? currentUser.getDepartment().getId() : null);
-            userDTO.setRoleId(String.valueOf(currentUser.getRole() != null ? currentUser.getRole().getId() : null));
+            // Fix: get first role id as String
+            String roleIdStr = null;
+            if (currentUser.getRoles() != null && !currentUser.getRoles().isEmpty()) {
+                roleIdStr = String.valueOf(currentUser.getRoles().iterator().next().getId());
+            }
+            userDTO.setRoleId(roleIdStr);
             return userDTO;
         }
         return null;
@@ -182,7 +189,9 @@ public class UserService {
             if (roleID != null) {
                 Role role = roleRepository.findById(roleID).orElse(null);
                 if (role != null) {
-                    currentUser.setRole(role);
+                    Set<Role> roles = new HashSet<>();
+                    roles.add(role);
+                    currentUser.setRoles(roles); // Fix: setRoles instead of setRole
                 }
             }
             userRepository.save(currentUser);
@@ -203,7 +212,10 @@ public class UserService {
             userDTO.setImageUrl(user.getImageUrl());
             String nameDepartment = user.getDepartment() != null ? user.getDepartment().getName() : "No Department";
             userDTO.setDepartmentName(nameDepartment);
-            String roleName = user.getRole() != null ? user.getRole().getName() : "No Role";
+            String roleName = "No Role";
+            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                roleName = user.getRoles().iterator().next().getName();
+            }
             userDTO.setRoleName(roleName);
             return userDTO;
         });
@@ -221,7 +233,6 @@ public class UserService {
             dto.setPhone(user.getPhone());
             dto.setImageUrl(user.getImageUrl());
             dto.setDepartmentName(user.getDepartment() != null ? user.getDepartment().getName() : "No Department");
-            dto.setRoleName(user.getRole() != null ? user.getRole().getName() : "No Role");
             return dto;
         }).toList();
     }

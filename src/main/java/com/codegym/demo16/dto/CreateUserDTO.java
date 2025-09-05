@@ -9,9 +9,8 @@ public class CreateUserDTO {
     @NotBlank(message = "Username is required")
     private String username;
 
-    @NotBlank(message = "Password is required")
-    @Min(value = 6, message = "Password must be at least 6 characters long")
-    @Max(value = 32, message = "Password must not exceed 20 characters")
+    @NotBlank
+    @Size(min = 6, message = "Password phải có ít nhất 6 ký tự")
     private String password;
 
     @NotBlank(message = "Email is required")

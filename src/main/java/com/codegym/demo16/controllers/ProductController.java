@@ -6,6 +6,7 @@ import com.codegym.demo16.services.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -19,10 +20,19 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @GetMapping("/{carName}")
+    public String carDetail(@PathVariable("carName") String carName, Model model) {
+        model.addAttribute("carName", carName);
+        return "products/car-detail";
+    }
+
+
     @GetMapping
     public String showProducts(Model model){
         List<Product> products = productService.getAllProducts();
         model.addAttribute("products", products); // dùng biến products đã lấy
         return "products/list"; // file Thymeleaf: src/main/resources/templates/products/list.html
     }
+
+
 }

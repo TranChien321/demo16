@@ -232,7 +232,7 @@
             <div class="car-box">
                 <img th:src="@{/resources/static/img/718.jpg}" alt="718">
                 <div class="car-info"><span>›</span> 718</div>
-                <a th:href="@{/products}" class="stretched-link"></a>
+                <a th:href="@{/products/{carName}(carName='718')}" class="stretched-link"></a>
             </div>
         </div>
         <!-- Car 2 -->
@@ -240,7 +240,7 @@
             <div class="car-box">
                 <img th:src="@{/resources/static/img/911.jpg}" alt="911">
                 <div class="car-info"><span>›</span> 911</div>
-                <a th:href="@{/products}" class="stretched-link"></a>
+                <a th:href="@{/products/{carName}(carName='911')}" class="stretched-link"></a>
             </div>
         </div>
         <!-- Car 3 -->
@@ -248,32 +248,28 @@
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Taycan.jpg}" alt="Taycan">
                 <div class="car-info"><span>›</span> Taycan</div>
-                <a th:href="@{/products}" class="stretched-link"></a>
-            </div>
+                <a th:href="@{/products/{carName}(carName='Taycan')}" class="stretched-link"></a>            </div>
         </div>
         <!-- Car 4 -->
         <div class="col-md-4 col-sm-6">
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Panamera.jpg}" alt="Panamera">
                 <div class="car-info"><span>›</span> Panamera</div>
-                <a th:href="@{/products}" class="stretched-link"></a>
-            </div>
+                <a th:href="@{/products/{carName}(carName='Panamera')}" class="stretched-link"></a>            </div>
         </div>
         <!-- Car 5 -->
         <div class="col-md-4 col-sm-6">
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Macan.jpg}" alt="Macan">
-                <div class="car-info"><span>›</span> Macan</div>
-                <a th:href="@{/products}" class="stretched-link"></a>
-            </div>
+                <div class="car-info"><span>›</span> Macan </div>
+                <a th:href="@{/products/{carName}(carName='Macan')}" class="stretched-link"></a>            </div>
         </div>
         <!-- Car 6 -->
         <div class="col-md-4 col-sm-6">
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Cayenne2.jpg}" alt="Cayenne">
-                <div class="car-info"><span>›</span> Cayenne</div>
-                <a th:href="@{/products}" class="stretched-link"></a>
-            </div>
+                <div class="car-info"><span>›</span> Cayenne </div>
+                <a th:href="@{/products/{carName}(carName='Cayenne')}" class="stretched-link"></a>            </div>
         </div>
     </div>
 </div>
@@ -285,7 +281,7 @@
             <div class="card-body p-4">
 
                 <div class="d-flex">
-                    <h6 class="flex-grow-1">Warsaw</h6>
+                    <h6 class="flex-grow-1">Hà Nội</h6>
                     <h6>15:07</h6>
                 </div>
 
