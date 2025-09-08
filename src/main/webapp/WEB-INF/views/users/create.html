@@ -100,22 +100,14 @@
                 </div>
 
                 <!-- Role -->
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <label for="role" class="form-label">Role</label>
-                        <select th:field="*{roleId}"
-                                th:class="${#fields.hasErrors('roleId') ? 'form-select is-invalid' : 'form-select'}"
-                                id="role">
-                            <option value="">Choose a role</option>
-                            <option th:each="role : ${roles}"
-                                    th:value="${role.id}"
-                                    th:text="${role.name}"></option>
-                        </select>
-                        <div th:if="${#fields.hasErrors('roleId')}" class="invalid-feedback">
-                            <span th:errors="*{roleId}"></span>
-                        </div>
-                    </div>
+                <div class="mb-3">
+                <label  class="form-label">Role</label>
+                <div th:each="role : ${roles}" class="form-check">
+                    <input class="form-check-input" th:field="*{roleIds}" type="checkbox" th:value="${role.id}" th:id="${role.id}">
+                    <label class="form-check-label" th:for="${role.id}" th:text="${role.name}">
+                    </label>
                 </div>
+            </div>
 
                 <div class="d-flex justify-content-between">
                     <button type="submit" class="btn btn-success btn-lg px-4">Create</button>

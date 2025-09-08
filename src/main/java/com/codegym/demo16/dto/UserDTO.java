@@ -1,5 +1,8 @@
 package com.codegym.demo16.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserDTO {
     private int id;
     private String username;
@@ -9,8 +12,8 @@ public class UserDTO {
     private String imageUrl;
     private String departmentName;
     private Long departmentId;
-    private String roleName;
-    private String roleId;
+    private List<String> nameRoles;
+    private List<Long> roleIds = new ArrayList<>();
 
     public UserDTO() {
     }
@@ -94,26 +97,20 @@ public class UserDTO {
         this.departmentId = departmentId;
     }
 
-    public String getRoleName() {
-        return roleName;
+
+    public List<String> getNameRoles() {
+        return nameRoles;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
+    public void setNameRoles(List<String> nameRoles) {
+        this.nameRoles = nameRoles;
     }
 
-    public Long getRoleId() {
-        if (roleId == null || roleId.trim().isEmpty()) {
-            return null;
-        }
-        try {
-            return Long.parseLong(roleId);
-        } catch (NumberFormatException e) {
-            return null;
-        }
+    public List<Long> getRoleIds() {
+        return roleIds;
     }
 
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 }

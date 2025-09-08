@@ -5,6 +5,7 @@ import com.codegym.demo16.dto.EditUserDTO;
 import com.codegym.demo16.dto.UserDTO;
 import com.codegym.demo16.dto.response.ListDepartmentResponse;
 import com.codegym.demo16.dto.response.ListUserResponse;
+import com.codegym.demo16.mappers.CreateUserMapper;
 import com.codegym.demo16.models.Department;
 import com.codegym.demo16.models.Role;
 import com.codegym.demo16.models.User;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.codegym.demo16.repositories.IRoleRepository;
 
@@ -28,12 +31,17 @@ public class UserService {
     private final IDepartmentRepository departmentRepository;
     private final FileManager fileManager;
     private final IRoleRepository roleRepository;
+    private final CreateUserMapper createUserMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(IUserRepository userRepository, IDepartmentRepository departmentRepository, FileManager fileManager, IRoleRepository roleRepository) {
+
+    public UserService(IUserRepository userRepository, IDepartmentRepository departmentRepository, FileManager fileManager, IRoleRepository roleRepository, CreateUserMapper createUserMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.fileManager = fileManager;
         this.roleRepository = roleRepository;
+        this.createUserMapper = createUserMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ListUserResponse getAllUsers(int pageNumber, int pageSize) {
@@ -55,14 +63,12 @@ public class UserService {
             String nameDepartment = user.getDepartment() != null ? user.getDepartment().getName() : "No Department";
             userDTO.setDepartmentName(nameDepartment);
 
-            // Fix: Handle multiple roles
-            String roleName = "No Role";
-            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-                roleName = user.getRoles().iterator().next().getName(); // get first role name
+            List<String> nameRoles = new ArrayList<>();
+            // get roleName
+            for (Role role : user.getRoles()) {
+                nameRoles.add(role.getName());
             }
-            userDTO.setRoleName(roleName);
-
-
+            userDTO.setNameRoles(nameRoles);
             userDTOs.add(userDTO);
         }
 
@@ -89,50 +95,32 @@ public class UserService {
         }
     }
 
-    public void storeUser(CreateUserDTO createUserDTO) {
-        // Lấy dữ liệu từ DTO
-        String username = createUserDTO.getUsername();
-        String password = createUserDTO.getPassword();
-        String email = createUserDTO.getEmail();
-        String phone = createUserDTO.getPhone();
-        Long departmentId = createUserDTO.getDepartmentId();
-        Long roleId = createUserDTO.getRoleId();   // ✅ Lấy roleId từ DTO
-        MultipartFile file = createUserDTO.getImage();
+    @Transactional
+    public void storeUser(CreateUserDTO dto) {
 
-        // Tạo đối tượng User mới
-        User newUser = new User();
-        newUser.setName(username);
-        newUser.setEmail(email);
-        newUser.setPassword(password);
-        newUser.setPhone(phone);
-
-        // Upload ảnh
-        if (file != null && !file.isEmpty()) {
-            String fileName = fileManager.uploadFile(UPLOAD_DIR, file);
-            newUser.setImageUrl(fileName);
+        // 1) Upload ảnh (nếu có)
+        String imageUrl = null;
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            imageUrl = fileManager.uploadFile(UPLOAD_DIR, dto.getImage());
         }
 
-        // Gán Department
-        if (departmentId != null) {
-            Department department = departmentRepository.findById(departmentId).orElse(null);
-            if (department != null) {
-                newUser.setDepartment(department);
-            }
+        // 2) Tìm Department (nếu có)
+        Department department = null;
+        if (dto.getDepartmentId() != null) {
+            department = departmentRepository.findById(dto.getDepartmentId()).orElse(null);
         }
 
-        // Gán Role (bắt buộc)
-        if (roleId != null) {
-            Role role = roleRepository.findById(roleId)
-                    .orElseThrow(() -> new RuntimeException("Role not found"));
-            Set<Role> roles = new HashSet<>();
-            roles.add(role);
-            newUser.setRoles(roles); // Fix: setRoles instead of setRole
-        } else {
-            throw new RuntimeException("Role is required");
-        }
+        // 3. Roles
+        Set<Role> roles = new HashSet<>(roleRepository.findAllById(dto.getRoleIds()));
 
+        // 4) Mã hoá mật khẩu
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+
+        User newUser = createUserMapper.toEntity(dto, encodedPassword, department, roles, imageUrl);
+        userRepository.save(newUser);
         // Lưu vào DB
         userRepository.save(newUser);
+
     }
 
 
@@ -147,56 +135,51 @@ public class UserService {
             userDTO.setPhone(currentUser.getPhone());
             userDTO.setImageUrl(currentUser.getImageUrl());
             userDTO.setDepartmentId(currentUser.getDepartment() != null ? currentUser.getDepartment().getId() : null);
-            // Fix: get first role id as String
-            String roleIdStr = null;
-            if (currentUser.getRoles() != null && !currentUser.getRoles().isEmpty()) {
-                roleIdStr = String.valueOf(currentUser.getRoles().iterator().next().getId());
-            }
-            userDTO.setRoleId(roleIdStr);
+
+            // Lấy tất cả role Id
+            List<Long> roleIds = currentUser.getRoles().stream()
+                    .map(Role::getId)
+                    .toList();
+            userDTO.setRoleIds(roleIds);
+
             return userDTO;
         }
         return null;
     }
 
-    //
+
     public void updateUser(int id, EditUserDTO editUserDTO) {
         Optional<User> user = userRepository.findById((long) id);
         if (user.isPresent()) {
-            // Update user details
             User currentUser = user.get();
             currentUser.setName(editUserDTO.getUsername());
             currentUser.setEmail(editUserDTO.getEmail());
             currentUser.setPhone(editUserDTO.getPhone());
 
-            Long departmentId = editUserDTO.getDepartmentId();
-            if (departmentId != null) {
-                Department department = departmentRepository.findById(departmentId).orElse(null);
-                if (department != null) {
-                    currentUser.setDepartment(department);
-                }
+            if (editUserDTO.getDepartmentId() != null) {
+                Department department = departmentRepository.findById(editUserDTO.getDepartmentId()).orElse(null);
+                currentUser.setDepartment(department);
             }
 
             MultipartFile file = editUserDTO.getImage();
-            if (!file.isEmpty()) {
-                // 1. xoa anh cu
+            if (file != null && !file.isEmpty()) {
                 fileManager.deleteFile(UPLOAD_DIR + "/" + currentUser.getImageUrl());
                 String fileName = fileManager.uploadFile(UPLOAD_DIR, file);
-                currentUser.setImageUrl(fileName); // Set the image URL
+                currentUser.setImageUrl(fileName);
             }
 
-            // Cập nhật Role (bắt buộc)
-            Long roleID = editUserDTO.getRoleId();
-            if (roleID != null) {
-                Role role = roleRepository.findById(roleID).orElse(null);
-                if (role != null) {
-                    Set<Role> roles = new HashSet<>();
-                    roles.add(role);
-                    currentUser.setRoles(roles); // Fix: setRoles instead of setRole
-                }
+            // Cập nhật nhiều Role
+            if (editUserDTO.getRoleIds() != null && !editUserDTO.getRoleIds().isEmpty()) {
+                Set<Role> roles = new HashSet<>(roleRepository.findAllById(editUserDTO.getRoleIds()));
+                currentUser.setRoles(roles);
+            } else {
+                currentUser.setRoles(new HashSet<>()); // nếu không chọn role → rỗng
             }
+
             userRepository.save(currentUser);
         }
     }
+
 
     public Page<UserDTO> searchUsers(String query, Pageable pageable) {
         Page<User> users = userRepository
@@ -210,16 +193,23 @@ public class UserService {
             userDTO.setEmail(user.getEmail());
             userDTO.setPhone(user.getPhone());
             userDTO.setImageUrl(user.getImageUrl());
+
             String nameDepartment = user.getDepartment() != null ? user.getDepartment().getName() : "No Department";
             userDTO.setDepartmentName(nameDepartment);
-            String roleName = "No Role";
+
+            // Lấy tất cả role name thành List<String>
+            List<String> nameRoles = new ArrayList<>();
             if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-                roleName = user.getRoles().iterator().next().getName();
+                for (Role role : user.getRoles()) {
+                    nameRoles.add(role.getName());
+                }
             }
-            userDTO.setRoleName(roleName);
+            userDTO.setNameRoles(nameRoles);
+
             return userDTO;
         });
     }
+
 
     public List<UserDTO> filterUsersByDepartment(Long departmentId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);

@@ -31,15 +31,18 @@
         .navbar {
             background-color: #343a40 !important;
         }
+
         .navbar .navbar-brand {
             color: #ffd700 !important;
             font-weight: bold;
             font-size: 20px;
         }
+
         .navbar .nav-link {
             color: #f8f9fa !important;
             margin-right: 15px;
         }
+
         .navbar .nav-link:hover {
             color: #ffd700 !important;
         }
@@ -52,13 +55,16 @@
             background-size: cover;
             position: relative;
         }
+
         .carousel-caption {
             bottom: 20%;
         }
+
         .carousel-caption h3 {
             font-size: 2.5rem;
             font-weight: bold;
         }
+
         .carousel-caption p {
             font-size: 1.2rem;
         }
@@ -70,18 +76,21 @@
             font-weight: bold;
             color: #333;
         }
+
         .product {
             background: #fff;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: transform .3s, box-shadow .3s;
             text-align: center;
         }
+
         .product:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
         }
+
         .product img {
             height: 400px;
             object-fit: cover;
@@ -93,6 +102,7 @@
             overflow: hidden;
             cursor: pointer;
         }
+
         .car-box img {
             width: 100%;
             height: 300px; /* cao hơn chút cho full khung giống Porsche */
@@ -100,9 +110,11 @@
             transition: transform 0.4s ease;
             display: block;
         }
+
         .car-box:hover img {
             transform: scale(1.05);
         }
+
         .car-info {
             position: absolute;
             bottom: 0;
@@ -112,8 +124,9 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: #fff;
-            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
         }
+
         .car-info span {
             color: #e00;
             margin-right: 5px;
@@ -132,6 +145,7 @@
             padding: 20px 0;
             text-align: center;
         }
+
         footer a {
             color: #ffd700;
             text-decoration: none;
@@ -157,26 +171,32 @@
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Role Management</a>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Role
+                        Management</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="/roles">List Roles</a></li>
                         <li><a class="dropdown-item" href="/roles/create">Add new</a></li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">User Management</a>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">User
+                        Management</a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/users">Show list</a></li>
-                        <li><a class="dropdown-item" href="/users/create">Add new</a></li>
+                        <li><a class="dropdown-item" href="/admin/users">Show list</a></li>
+                        <li><a class="dropdown-item" href="/admin/users/create">Add new</a></li>
                     </ul>
                 </li>
                 <li class="nav-item"><a class="nav-link" href="#">Disabled</a></li>
             </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search">
-                <button class="btn btn-success me-2" type="submit">Search</button>
-                <a href="/auth/login" class="btn btn-warning">Login</a>
-            </form>
+
+            <!-- PHẦN LOGIN / EMAIL -->
+            <div class="d-flex align-items-center">
+               <span th:if="${userEmail != null}" class="text-white me-3">
+                   Hello, <b th:text="${userEmail}"></b>
+               </span>
+                <a th:if="${userEmail != null}" href="/auth/logout" class="btn btn-danger me-2">Logout</a>
+                <a th:if="${userEmail == null}" href="/auth/login" class="btn btn-warning">Login</a>
+            </div>
         </div>
     </div>
 </nav>
@@ -184,7 +204,8 @@
 <!-- Carousel -->
 <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators">
-        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active"
+                aria-current="true"></button>
         <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
         <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
     </div>
@@ -248,28 +269,28 @@
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Taycan.jpg}" alt="Taycan">
                 <div class="car-info"><span>›</span> Taycan</div>
-                <a th:href="@{/products/{carName}(carName='Taycan')}" class="stretched-link"></a>            </div>
+                <a th:href="@{/products/{carName}(carName='Taycan')}" class="stretched-link"></a></div>
         </div>
         <!-- Car 4 -->
         <div class="col-md-4 col-sm-6">
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Panamera.jpg}" alt="Panamera">
                 <div class="car-info"><span>›</span> Panamera</div>
-                <a th:href="@{/products/{carName}(carName='Panamera')}" class="stretched-link"></a>            </div>
+                <a th:href="@{/products/{carName}(carName='Panamera')}" class="stretched-link"></a></div>
         </div>
         <!-- Car 5 -->
         <div class="col-md-4 col-sm-6">
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Macan.jpg}" alt="Macan">
-                <div class="car-info"><span>›</span> Macan </div>
-                <a th:href="@{/products/{carName}(carName='Macan')}" class="stretched-link"></a>            </div>
+                <div class="car-info"><span>›</span> Macan</div>
+                <a th:href="@{/products/{carName}(carName='Macan')}" class="stretched-link"></a></div>
         </div>
         <!-- Car 6 -->
         <div class="col-md-4 col-sm-6">
             <div class="car-box">
                 <img th:src="@{/resources/static/img/Cayenne2.jpg}" alt="Cayenne">
-                <div class="car-info"><span>›</span> Cayenne </div>
-                <a th:href="@{/products/{carName}(carName='Cayenne')}" class="stretched-link"></a>            </div>
+                <div class="car-info"><span>›</span> Cayenne</div>
+                <a th:href="@{/products/{carName}(carName='Cayenne')}" class="stretched-link"></a></div>
         </div>
     </div>
 </div>
@@ -286,7 +307,7 @@
                 </div>
 
                 <div class="d-flex flex-column text-center mt-5 mb-4">
-                    <h6 class="display-4 mb-0 font-weight-bold" th:text="${temp + 'C'}"> </h6>
+                    <h6 class="display-4 mb-0 font-weight-bold" th:text="${temp + 'C'}"></h6>
                     <span class="small" style="color: #868B94">Stormy</span>
                 </div>
 

@@ -111,6 +111,7 @@ public class UserController {
     }
 
 
+
     @GetMapping("/{id}/detail")
     public String userDetail(@PathVariable("id") String id,
                              Model model) {
@@ -160,6 +161,7 @@ public class UserController {
             return "errors/404";
         }
 
+        // Khởi tạo EditUserDTO với thông tin cơ bản
         EditUserDTO editUserDTO = new EditUserDTO(
                 Math.toIntExact(user.getId()),
                 user.getUsername(),
@@ -167,7 +169,9 @@ public class UserController {
                 user.getPhone()
         );
         editUserDTO.setDepartmentId(user.getDepartmentId());
-        editUserDTO.setRoleId(user.getRoleId()); // 🔥 Sửa ở đây
+
+        // 🔥 Sửa ở đây để hỗ trợ nhiều role
+        editUserDTO.setRoleIds(user.getRoleIds());
 
         List<DepartmentDTO> departments = departmentService.getAllDepartments();
         List<RoleDTO> roles = roleService.getAllRoles();
@@ -178,6 +182,7 @@ public class UserController {
 
         return "users/edit";
     }
+
 
     //
     @PostMapping("/{id}/update")
@@ -216,7 +221,7 @@ public class UserController {
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", usersPage.getTotalPages());
         } else {
-           ListUserResponse listResp = userService.getAllUsers(page, size);
+            ListUserResponse listResp = userService.getAllUsers(page, size);
             model.addAttribute("users", listResp.getUsers());
             model.addAttribute("currentPage", listResp.getCurrentPage());
             model.addAttribute("totalPages", listResp.getTotalPage());

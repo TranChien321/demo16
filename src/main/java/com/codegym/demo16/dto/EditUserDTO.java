@@ -2,6 +2,8 @@ package com.codegym.demo16.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public class EditUserDTO {
     private int id;
     private String username;
@@ -9,7 +11,7 @@ public class EditUserDTO {
     private String phone;
     private MultipartFile image;
     private Long departmentId;
-    private Long roleId;
+    private List<Long> roleIds;
 
     public EditUserDTO() {
     }
@@ -69,11 +71,11 @@ public class EditUserDTO {
         this.departmentId = departmentId;
     }
 
-    public Long getRoleId() {
-        return roleId;
+    public List<Long> getRoleIds() {
+        return roleIds;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 }

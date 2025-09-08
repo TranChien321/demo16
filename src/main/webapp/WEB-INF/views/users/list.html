@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layout}">
 <head>
     <title>User Management</title>
@@ -38,7 +39,7 @@
 <section layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary"><i class="fa fa-users"></i> User Management</h2>
-        <a class="btn btn-success" href="/admin/users/create">
+        <a sec:authorize="hasRole('ADMIN')" class="btn btn-success" href="/admin/users/create">
             <i class="fa fa-plus"></i> Create User
         </a>
     </div>
@@ -68,69 +69,76 @@
         </div>
     </div>
     <div class="card shadow-lg">
-            <div class="card-body">
-                <table class="table table-hover table-bordered align-middle text-center">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>STT</th>
-                        <th>Name</th>
-                        <th>Image</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Department</th>
-                        <th>Role</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="user, userStat : ${users}">
-                        <td th:text="${userStat.index + 1}"></td>
-                        <td th:text="${user.getUsername()}"></td>
-                        <td>
-                            <img class="user-img" th:src="@{/resources/uploads/{url}(url=${user.getImageUrl()})}" alt="User image">
-                        </td>
-                        <td th:text="${user.getEmail()}"></td>
-                        <td th:text="${user.getPhone()}"></td>
-                        <td th:text="${user.getDepartmentName()}"></td>
-                        <td th:text="${user.getRoleName()}"></td>
-                        <td>
-                            <a class="btn btn-sm btn-info" th:href="@{/admin/users/{id}/detail(id=${user.getId()})}">
-                                <i class="fa fa-eye"></i>
-                            </a>
-                            <a class="btn btn-sm btn-primary" th:href="@{/admin/users/{id}/edit(id=${user.getId()})}">
-                                <i class="fa fa-edit"></i>
-                            </a>
-                            <a class="btn btn-sm btn-danger"
-                               th:if="${user.getId() != null}"
-                               onclick="return confirm('Are you sure?')"
-                               th:href="@{/admin/users/{id}/delete(id=${user.getId()})}">
-                                <i class="fa fa-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div class="card-body">
+            <table class="table table-hover table-bordered align-middle text-center">
+                <thead class="table-dark">
+                <tr>
+                    <th>STT</th>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th sec:authorize="hasRole('ADMIN')" >Role</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user, userStat : ${users}">
+                    <td th:text="${userStat.index + 1}"></td>
+                    <td th:text="${user.getUsername()}"></td>
+                    <td>
+                        <img class="user-img" th:src="@{/resources/uploads/{url}(url=${user.getImageUrl()})}" alt="User image">
+                    </td>
+                    <td th:text="${user.getEmail()}"></td>
+                    <td th:text="${user.getPhone()}"></td>
+                    <td th:text="${user.getDepartmentName()}"></td>
 
-                <!-- Pagination -->
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item">
-                            <a class="page-link" href="#">Previous</a>
-                        </li>
-                        <li class="page-item"
-                            th:each="i : ${#numbers.sequence(1, totalPages)}"
-                            th:classappend="${i == currentPage} ? 'active'">
-                            <a class="page-link"
-                               th:href="@{/admin/users(page=${i},size=5)}"
-                               th:text="${i}"></a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+                    <td sec:authorize="hasRole('ADMIN')" >
+                        <p th:each="role : ${user.nameRoles}" th:text="${role}"></p>
+                    </td>
+
+
+                    <td>
+                        <a sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-primary" th:href="@{/admin/users/{id}/edit(id=${user.getId()})}">
+                            <i class="fa fa-edit"></i>
+                        </a>
+
+                        <a sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-danger"
+                           th:if="${user.getId() != null}"
+                           onclick="return confirm('Are you sure?')"
+                           th:href="@{/admin/users/{id}/delete(id=${user.getId()})}">
+                            <i class="fa fa-trash"></i>
+                        </a>
+
+                        <a class="btn btn-sm btn-info" th:href="@{/admin/users/{id}/detail(id=${user.getId()})}">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="#">Previous</a>
+                    </li>
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(1, totalPages)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/admin/users(page=${i},size=5)}"
+                           th:text="${i}"></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
+    </div>
     </div>
 </section>
 </body>

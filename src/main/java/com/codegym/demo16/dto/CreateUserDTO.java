@@ -5,6 +5,8 @@ import com.codegym.demo16.validations.custom.ValidImage;
 import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public class CreateUserDTO {
     @NotBlank(message = "Username is required")
     private String username;
@@ -25,7 +27,9 @@ public class CreateUserDTO {
     private MultipartFile image;
 
     private Long departmentId;
-    private Long roleId;
+
+    @NotEmpty(message = "Phai chon it nhat 1 vai tro")
+    private List<Long> roleIds;
 
     public CreateUserDTO() {
     }
@@ -85,11 +89,11 @@ public class CreateUserDTO {
         this.departmentId = departmentId;
     }
 
-    public Long getRoleId() {
-        return roleId;
+    public @NotEmpty(message = "Phải chọn ít nhất 1 role") List<Long> getRoleIds() {
+        return roleIds;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setRoleIds(@NotEmpty(message = "Phải chọn ít nhất 1 role") List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 }

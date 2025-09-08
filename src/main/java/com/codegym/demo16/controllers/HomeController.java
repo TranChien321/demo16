@@ -3,6 +3,7 @@ package com.codegym.demo16.controllers;
 import com.codegym.demo16.dto.response.OpenWeatherResponse;
 import com.codegym.demo16.services.OpenWeatherService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +20,12 @@ public class HomeController {
     }
 
     @GetMapping
-    public String showHomePage(Model model) {
-        // Return the name of the view for the home page
-        OpenWeatherResponse ow = openWeatherService.getWeatherCurrent("Hanoi");
-        double temp = Math.ceil(ow.getMain().getTemp() - 273);
-        model.addAttribute("temp", temp);
+    public String homePage(Model model, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            // Lấy email đăng nhập
+            String userEmail = authentication.getName();
+            model.addAttribute("userEmail", userEmail);
+        }
         return "index"; // This will resolve to /WEB-INF/views/home.jsp
     }
 }

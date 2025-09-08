@@ -29,7 +29,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/resources/**", "/auth/login").permitAll()
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/home").hasAnyRole("USER","ADMIN","MANAGER")
+                        .requestMatchers("/admin/users", "/admin/users/search","/admin/users/*/detail").hasAnyRole("ADMIN","MANAGER")
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -37,7 +39,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/auth/login")
                         .usernameParameter("email")             // nếu bạn dùng email thay vì username
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/admin/users", true)
+                        .defaultSuccessUrl("/home", true)
                         .failureUrl("/auth/login?error")   // khi sai tài khoản/mật khẩu
                         .permitAll())
                 .logout(logout -> logout.permitAll());
